@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Usage Time Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="app-container">
+            <!-- Header with gradient border -->
+            <div class="header-border"></div>
+            
+            <!-- Main Content -->
+            <div class="content">
+                <!-- App Header -->
+                <div class="app-header">
+                    <div class="logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="instagram-icon">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                        <h1>Engagement Time Prediction</h1>
+                    </div>
+                    <p class="subtitle">Advanced machine learning to predict your Instagram engagement time based on post analytics</p>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="stats-container">
+                    <div class="stat">
+                        <p class="stat-value" id="followers-stat">0</p>
+                        <p class="stat-label">Followers</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-value" id="engagement-stat">0%</p>
+                        <p class="stat-label">Engagement</p>
+                    </div>
+                    <div class="stat">
+                        <p class="stat-value" id="avg-time-stat">0h</p>
+                        <p class="stat-label">Avg Time</p>
+                    </div>
+                </div>
+
+                <!-- Prediction Result (initially hidden) -->
+                <div class="prediction-result" id="prediction-result">
+                    <div class="prediction-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    </div>
+                    <p>{{ prediction_text }}</p>
+                    {% if gif_filename %}
+                    <div class="result-gif">
+                        <img src="{{ url_for('static', filename='images/' + gif_filename) }}" alt="Result GIF">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Analysis Complete Screen (initially hidden) -->
+                <div class="analysis-complete" id="analysis-complete">
+                    <div class="check-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <p>Analysis Complete!</p>
+                </div>
+
+                <!-- Form Section -->
+                <form id="prediction-form" action="/predict" method="post">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="follower_count">Follower Count</label>
+                            <div class="input-with-icon">
+                                <input type="number" id="follower_count" name="follower_count" placeholder="e.g., 1000" required>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <p class="input-help">Number of followers on your account</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="hashtags_count">Hashtags Count</label>
+                            <div class="input-with-icon">
+                                <input type="number" id="hashtags_count" name="hashtags_count" placeholder="e.g., 5" required>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon">
+                                    <line x1="4" y1="9" x2="20" y2="9"></line>
+                                    <line x1="4" y1="15" x2="20" y2="15"></line>
+                                    <line x1="10" y1="3" x2="8" y2="21"></line>
+                                    <line x1="16" y1="3" x2="14" y2="21"></line>
+                                </svg>
+                            </div>
+                            <p class="input-help">Number of hashtags you typically use</p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="post_type">Post Type</label>
+                            <div class="select-wrapper">
+                                <select id="post_type" name="post_type" required>
+                                    <option value="Image">Image</option>
+                                    <option value="Video">Video</option>
+                                    <option value="Carousel">Carousel</option>
+                                </select>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="select-icon">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <p class="input-help">Type of content you're posting</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="time_of_day">Time of Day</label>
+                            <div class="select-wrapper">
+                                <select id="time_of_day" name="time_of_day" required>
+                                    <option value="08:00">Morning</option>
+                                    <option value="12:00">Noon</option>
+                                    <option value="16:00">Afternoon</option>
+                                    <option value="20:00">Evening</option>
+                                    <option value="23:00">Night</option>
+                                </select>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="select-icon">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <p class="input-help">When you typically post content</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="caption_length">Caption Length</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="caption_length" name="caption_length" placeholder="e.g., 150" required>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon">
+                                <line x1="17" y1="10" x2="3" y2="10"></line>
+                                <line x1="21" y1="6" x2="3" y2="6"></line>
+                                <line x1="21" y1="14" x2="3" y2="14"></line>
+                                <line x1="17" y1="18" x2="3" y2="18"></line>
+                            </svg>
+                        </div>
+                        <p class="input-help">Average length of your captions in characters</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="avg_likes">Average Likes</label>
+                            <div class="input-with-icon">
+                                <input type="number" id="avg_likes" name="avg_likes" placeholder="e.g., 100" required>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </div>
+                            <p class="input-help">Average likes per post</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="avg_comments">Average Comments</label>
+                            <div class="input-with-icon">
+                                <input type="number" id="avg_comments" name="avg_comments" placeholder="e.g., 10" required>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="input-icon">
+                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                                </svg>
+                            </div>
+                            <p class="input-help">Average comments per post</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="predict-button">Predict Instagram Usage Time</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
